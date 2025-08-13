@@ -293,6 +293,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Built for [Kupon.id](https://kupon.id) - Indonesia's leading deals aggregator
+- Built for [Nexvou Scripts](https://nexvou.com) - Indonesia's leading deals aggregator
 - Powered by Supabase for database operations
 - Uses Puppeteer for web automation
