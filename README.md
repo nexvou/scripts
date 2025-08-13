@@ -92,12 +92,12 @@ npm run scrape:schedule
 
 ### Development Commands
 
-| Command               | Description                    |
-| --------------------- | ------------------------------ |
-| `npm run lint`        | Run ESLint code linting        |
-| `npm run lint:fix`    | Fix ESLint issues automatically |
-| `npm run format`      | Format code with Prettier      |
-| `npm run format:check` | Check code formatting          |
+| Command                | Description                     |
+| ---------------------- | ------------------------------- |
+| `npm run lint`         | Run ESLint code linting         |
+| `npm run lint:fix`     | Fix ESLint issues automatically |
+| `npm run format`       | Format code with Prettier       |
+| `npm run format:check` | Check code formatting           |
 
 ## ⚙️ Configuration
 
