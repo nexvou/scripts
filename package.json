@@ -1,0 +1,78 @@
+{
+    "name": "@nexvou/scripts",
+    "version": "1.0.0",
+    "description": "Advanced web scraper system - Powerful, clean, and structured scraper for deals and promotions",
+    "main": "index.js",
+    "bin": {
+        "kupon-scraper": "./bin/cli.js"
+    },
+    "scripts": {
+        "start": "node index.js",
+        "test": "node index.js --test",
+        "scrape": "node index.js",
+        "scrape:single": "node index.js --single",
+        "scrape:schedule": "node index.js --schedule",
+        "scrape:shopee": "node index.js --single shopee",
+        "scrape:tokopedia": "node index.js --single tokopedia",
+        "scrape:lazada": "node index.js --single lazada",
+        "scrape:blibli": "node index.js --single blibli",
+        "scrape:traveloka": "node index.js --single traveloka",
+        "scrape:grab": "node index.js --single grab",
+        "demo": "node demo/demo-scraper.js",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "prepare": "husky"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.38.5",
+        "cheerio": "^1.1.2",
+        "dotenv": "^17.2.1",
+        "node-cron": "^3.0.3",
+        "puppeteer": "^21.11.0"
+    },
+    "devDependencies": {
+        "eslint": "^8.56.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.5",
+        "prettier": "^3.6.2"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=8.0.0"
+    },
+    "keywords": [
+        "scraper",
+        "web-scraping",
+        "e-commerce",
+        "indonesia",
+        "shopee",
+        "tokopedia",
+        "lazada",
+        "deals",
+        "coupons",
+        "promotions",
+        "automation",
+        "data-extraction"
+    ],
+    "author": "Nexvou Team",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nexvou/scripts.git"
+    },
+    "bugs": {
+        "url": "https://github.com/nexvou/scripts/issues"
+    },
+    "homepage": "https://github.com/nexvou/scripts#readme",
+    "lint-staged": {
+        "*.{js,jsx,ts,tsx}": [
+            "eslint --fix",
+            "prettier --write"
+        ],
+        "*.{json,md,yml,yaml}": [
+            "prettier --write"
+        ]
+    }
+}
