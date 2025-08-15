@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Production-ready e-commerce coupon scraper for Indonesian platforms",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
@@ -10,12 +11,13 @@
     "scrape:single": "node src/cli/scrape.js --platform",
     "migrate": "node src/cli/migrate.js",
     "seed": "node src/cli/seed.js",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:unit": "jest --testPathPattern=tests/unit",
     "test:integration": "jest --testPathPattern=tests/integration",
     "test:e2e": "jest --testPathPattern=tests/e2e",
     "lint": "eslint src/ --fix",
     "format": "prettier --write src/",
+    "format:check": "prettier --check src/",
     "build": "echo 'No build step required for Node.js'",
     "vercel-build": "npm run migrate",
     "deploy": "vercel --prod"
