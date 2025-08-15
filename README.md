@@ -1,15 +1,15 @@
 # 🚀 Nexvou Scripts Advanced Scraper System
 
-Sistem scraper yang powerful, clean, dan terstruktur untuk mengumpulkan data promo dari berbagai platform e-commerce Indonesia.
+A powerful, clean, and structured scraper system for collecting data on the best coupons, discounts, and promotions from various Indonesian and global e-commerce platforms.
 
 ## ✨ Features
 
 - **Multi-Platform Support**: Shopee, Tokopedia, Lazada, Blibli, Traveloka, Grab
-- **Clean Architecture**: Modular design dengan separation of concerns
-- **Rate Limiting**: Intelligent rate limiting untuk setiap platform
-- **Error Handling**: Robust error handling dan retry mechanisms
-- **Anti-Bot Protection**: Bypass anti-bot measures dengan user agent rotation
-- **Database Integration**: Seamless integration dengan Supabase
+- **Clean Architecture**: Modular design with separation of responsibilities
+- **Rate Limiting**: Intelligent speed limiting for each platform
+- **Error Handling**: Reliable error handling and retry mechanisms
+- **Anti-Bot Protection**: Countering anti-bot measures with user agent rotation
+- **Database Integration**: Seamless integration with Supabase
 - **Scheduling**: Built-in cron job scheduling
 - **Logging**: Comprehensive logging system
 - **Testing**: Built-in test suite
@@ -47,7 +47,8 @@ npm install
 
 ```bash
 cp .env.example .env
-# Edit .env with your Supabase credentials
+# For local development: SQLite is used automatically (no config needed)
+# For production: Edit .env with your Supabase credentials
 ```
 
 ### 3. Test Connection
@@ -110,14 +111,21 @@ Edit `config/scraper.config.js` to customize:
 
 ## 🔧 Environment Variables
 
+### Development (SQLite)
+
 ```bash
-# Supabase Configuration
+NODE_ENV=development
+DEBUG=true
+# SQLite database is created automatically in ./data/scraper.db
+```
+
+### Production (Supabase)
+
+```bash
+NODE_ENV=production
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# Scraper Settings
-NODE_ENV=production
 SCRAPER_HEADLESS=true
 SCRAPER_TIMEOUT=30000
 SCRAPER_MAX_ITEMS=50
@@ -163,6 +171,32 @@ SCRAPER_MAX_ITEMS=50
 - Food delivery promos
 - Mart discounts
 - Short-term deals
+
+## 🗄️ Database Support
+
+### Dual Database System
+
+- **Development**: SQLite database (automatic setup)
+- **Production**: Supabase (PostgreSQL) database
+
+### Automatic Database Selection
+
+- `NODE_ENV=development` → Uses SQLite
+- `NODE_ENV=production` → Uses Supabase
+
+### SQLite Features (Development)
+
+- Zero configuration required
+- Automatic table creation and seeding
+- Fast local development
+- Database file: `./data/scraper.db`
+
+### Supabase Features (Production)
+
+- Scalable PostgreSQL database
+- Real-time capabilities
+- Built-in authentication
+- Row Level Security (RLS)
 
 ## 📊 Data Processing
 

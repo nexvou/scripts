@@ -1,28 +1,54 @@
 const { createClient } = require('@supabase/supabase-js');
+const SQLiteManager = require('./SQLiteManager');
 const Logger = require('../utils/Logger');
 
 class DatabaseManager {
     constructor() {
         this.logger = new Logger('DatabaseManager');
-        this.supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-        );
-        this.merchantCache = new Map();
+        this.isProduction = process.env.NODE_ENV === 'production';
+
+        if (this.isProduction) {
+            // Use Supabase in production
+            this.supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL,
+                process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+            );
+            this.merchantCache = new Map();
+            this.logger.info('Using Supabase database (production)');
+        } else {
+            // Use SQLite in development/local
+            this.sqlite = new SQLiteManager();
+            this.logger.info('Using SQLite database (development)');
+        }
     }
 
     async testConnection() {
+        if (this.isProduction) {
+            return this.testSupabaseConnection();
+        } else {
+            return this.sqlite.testConnection();
+        }
+    }
+
+    async testSupabaseConnection() {
         try {
             const { error } = await this.supabase.from('merchants').select('count').limit(1);
-
             return !error;
         } catch (error) {
-            this.logger.error('Database connection test failed:', error);
+            this.logger.error('Supabase connection test failed:', error);
             return false;
         }
     }
 
     async getMerchantId(slug) {
+        if (this.isProduction) {
+            return this.getSupabaseMerchantId(slug);
+        } else {
+            return this.sqlite.getMerchantId(slug);
+        }
+    }
+
+    async getSupabaseMerchantId(slug) {
         // Use cache to avoid repeated queries
         if (this.merchantCache.has(slug)) {
             return this.merchantCache.get(slug);
@@ -45,6 +71,14 @@ class DatabaseManager {
     }
 
     async saveCoupon(couponData) {
+        if (this.isProduction) {
+            return this.saveSupabaseCoupon(couponData);
+        } else {
+            return this.sqlite.saveCoupon(couponData);
+        }
+    }
+
+    async saveSupabaseCoupon(couponData) {
         try {
             // Validate required fields
             if (!couponData.title || !couponData.merchant_id) {
@@ -78,6 +112,14 @@ class DatabaseManager {
     }
 
     async saveBatch(coupons) {
+        if (this.isProduction) {
+            return this.saveSupabaseBatch(coupons);
+        } else {
+            return this.sqlite.saveBatch(coupons);
+        }
+    }
+
+    async saveSupabaseBatch(coupons) {
         if (!coupons.length) return { saved: 0, errors: 0 };
 
         let saved = 0;
@@ -120,6 +162,14 @@ class DatabaseManager {
     }
 
     async cleanupExpired() {
+        if (this.isProduction) {
+            return this.cleanupSupabaseExpired();
+        } else {
+            return this.sqlite.cleanupExpired();
+        }
+    }
+
+    async cleanupSupabaseExpired() {
         try {
             const { data, error } = await this.supabase
                 .from('coupons')
@@ -148,6 +198,14 @@ class DatabaseManager {
     }
 
     async updateStats() {
+        if (this.isProduction) {
+            return this.updateSupabaseStats();
+        } else {
+            return this.sqlite.updateStats();
+        }
+    }
+
+    async updateSupabaseStats() {
         try {
             // Update coupon view counts, click counts, etc.
             // This would typically call a stored procedure or function
@@ -168,6 +226,14 @@ class DatabaseManager {
     }
 
     async getCouponCount(merchantId = null) {
+        if (this.isProduction) {
+            return this.getSupabaseCouponCount(merchantId);
+        } else {
+            return this.sqlite.getCouponCount(merchantId);
+        }
+    }
+
+    async getSupabaseCouponCount(merchantId = null) {
         try {
             let query = this.supabase.from('coupons').select('count').eq('status', 'active');
 
@@ -190,6 +256,14 @@ class DatabaseManager {
     }
 
     async getRecentCoupons(limit = 10) {
+        if (this.isProduction) {
+            return this.getSupabaseRecentCoupons(limit);
+        } else {
+            return this.sqlite.getRecentCoupons(limit);
+        }
+    }
+
+    async getSupabaseRecentCoupons(limit = 10) {
         try {
             const { data, error } = await this.supabase
                 .from('coupons')
@@ -212,6 +286,12 @@ class DatabaseManager {
 
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    close() {
+        if (!this.isProduction && this.sqlite) {
+            this.sqlite.close();
+        }
     }
 }
 

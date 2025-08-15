@@ -7,22 +7,22 @@
         "kupon-scraper": "./bin/cli.js"
     },
     "scripts": {
-        "start": "node index.js",
-        "test": "node index.js --test",
-        "scrape": "node index.js",
-        "scrape:single": "node index.js --single",
-        "scrape:schedule": "node index.js --schedule",
-        "scrape:shopee": "node index.js --single shopee",
-        "scrape:tokopedia": "node index.js --single tokopedia",
-        "scrape:lazada": "node index.js --single lazada",
-        "scrape:blibli": "node index.js --single blibli",
-        "scrape:traveloka": "node index.js --single traveloka",
-        "scrape:grab": "node index.js --single grab",
-        "demo": "node demo/demo-scraper.js",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
-        "format": "prettier --write .",
-        "format:check": "prettier --check .",
+        "start": "bun run index.js",
+        "test": "bun run index.js --test",
+        "scrape": "bun run index.js",
+        "scrape:single": "bun run index.js --single",
+        "scrape:schedule": "bun run index.js --schedule",
+        "scrape:shopee": "bun run index.js --single shopee",
+        "scrape:tokopedia": "bun run index.js --single tokopedia",
+        "scrape:lazada": "bun run index.js --single lazada",
+        "scrape:blibli": "bun run index.js --single blibli",
+        "scrape:traveloka": "bun run index.js --single traveloka",
+        "scrape:grab": "bun run index.js --single grab",
+        "demo": "bun run demo/demo-scraper.js",
+        "lint": "bunx eslint .",
+        "lint:fix": "bunx eslint . --fix",
+        "format": "bunx prettier --write .",
+        "format:check": "bunx prettier --check .",
         "prepare": "husky"
     },
     "dependencies": {
@@ -30,7 +30,8 @@
         "cheerio": "^1.1.2",
         "dotenv": "^17.2.1",
         "node-cron": "^3.0.3",
-        "puppeteer": "^21.11.0"
+        "puppeteer": "^21.11.0",
+        "sqlite3": "^5.1.7"
     },
     "devDependencies": {
         "eslint": "^8.56.0",
@@ -40,7 +41,7 @@
     },
     "engines": {
         "node": ">=18.0.0",
-        "npm": ">=8.0.0"
+        "bun": ">=1.0.0"
     },
     "keywords": [
         "scraper",
