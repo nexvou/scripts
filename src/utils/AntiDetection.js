@@ -49,9 +49,7 @@ class AntiDetection {
             // Override permissions
             const originalQuery = window.navigator.permissions.query;
             window.navigator.permissions.query = parameters =>
-                parameters.name === 'notifications'
-                    ? Promise.resolve({ state: Cypress.env('notification_permission') || 'granted' })
-                    : originalQuery(parameters);
+                parameters.name === 'notifications' ? Promise.resolve({ state: 'granted' }) : originalQuery(parameters);
         });
 
         // Set viewport with slight randomization

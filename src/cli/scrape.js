@@ -69,7 +69,7 @@ program
             console.log(`Last Update: ${status.lastUpdate}`);
 
             console.log('\n🤖 Platform Status:');
-            for (const [slug, scraper] of Object.entries(status.scrapers)) {
+            for (const scraper of Object.values(status.scrapers)) {
                 const statusIcon =
                     scraper.status === 'completed'
                         ? '✅'

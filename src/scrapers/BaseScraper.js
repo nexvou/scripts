@@ -216,7 +216,7 @@ class BaseScraper {
                     const items = [];
                     const containers = document.querySelectorAll(sel.couponContainer);
 
-                    containers.forEach((container, index) => {
+                    containers.forEach((container, _index) => {
                         try {
                             const coupon = {
                                 title: null,
@@ -358,7 +358,7 @@ class BaseScraper {
                     : parseInt(cashbackMatch[2].replace(/[.,]/g, ''));
                 return {
                     type: 'cashback',
-                    value: value,
+                    value,
                 };
             }
         }
@@ -428,7 +428,7 @@ class BaseScraper {
                 found: totalFound,
                 saved: totalSaved,
                 errors: totalErrors,
-                duration: duration,
+                duration,
             };
         } catch (error) {
             this.logger.error('❌ Scraping failed:', error);

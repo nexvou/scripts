@@ -222,7 +222,7 @@ class ScraperService {
             totalScrapers: this.scrapers.size,
             activeScrapers: Array.from(this.scrapers.values()).filter(s => s.status === 'running').length,
             lastUpdate: new Date().toISOString(),
-            metrics: metrics,
+            metrics,
             scrapers: Object.fromEntries(
                 Array.from(this.scrapers.entries()).map(([slug, info]) => [
                     slug,

@@ -49,10 +49,11 @@ class DatabaseAdapter {
                     });
                     break;
 
-                case 'supabase':
+                case 'supabase': {
                     const supabaseConfig = dbConfig.connections.supabase;
                     this.supabase = createClient(supabaseConfig.url, supabaseConfig.key);
                     break;
+                }
 
                 default:
                     throw new Error(`Unsupported database adapter: ${this.adapter}`);
@@ -62,14 +63,14 @@ class DatabaseAdapter {
             await this.testConnection();
             this.logger.info(`✅ Connected to ${this.adapter} database successfully`);
         } catch (error) {
-            this.logger.error(`❌ Database connection failed:`, error);
+            this.logger.error('❌ Database connection failed:', error);
             throw error;
         }
     }
 
     async testConnection() {
         if (this.adapter === 'supabase') {
-            const { data, error } = await this.supabase.from('platforms').select('count').limit(1);
+            const { error } = await this.supabase.from('platforms').select('count').limit(1);
             if (error && error.code !== 'PGRST116') {
                 // Ignore table not found for initial setup
                 throw error;
@@ -205,7 +206,7 @@ class DatabaseAdapter {
 
         if (this.adapter === 'supabase') {
             try {
-                const { data, error } = await this.supabase.from('coupons').upsert(coupons, {
+                const { error } = await this.supabase.from('coupons').upsert(coupons, {
                     onConflict: 'title,platform_id,merchant_id',
                     ignoreDuplicates: false,
                 });
@@ -271,14 +272,14 @@ class DatabaseAdapter {
         const now = new Date().toISOString();
 
         if (this.adapter === 'supabase') {
-            const { data, error } = await this.supabase
+            const { error } = await this.supabase
                 .from('coupons')
                 .update({ status: 'expired', updated_at: now })
                 .lt('valid_until', now)
                 .eq('status', 'active');
 
             if (error) throw error;
-            return data?.length || 0;
+            return 0; // Supabase doesn't return affected count easily
         }
 
         const result = await this.connection('coupons')
