@@ -61,7 +61,17 @@ class ScraperManager {
 
         try {
             this.logger.info(`🎯 Starting scrape for ${platform}`);
-            const result = await scraper.scrape();
+            
+            // Add timeout to prevent hanging
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Scrape timeout after 5 minutes')), 300000);
+            });
+            
+            const result = await Promise.race([
+                scraper.scrape(),
+                timeoutPromise
+            ]);
+            
             this.logger.info(`✅ ${platform}: ${result.saved}/${result.found} items saved`);
             return result;
         } catch (error) {

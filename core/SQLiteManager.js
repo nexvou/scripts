@@ -10,6 +10,8 @@ class SQLiteManager {
         this.db = null;
         this.merchantCache = new Map();
         this.initialized = false;
+        this.initializing = false;
+        this.initPromise = null;
 
         // Don't await in constructor, initialize lazily
     }
@@ -22,8 +24,13 @@ class SQLiteManager {
                 fs.mkdirSync(dataDir, { recursive: true });
             }
 
-            // Initialize database
-            this.db = new sqlite3.Database(this.dbPath);
+            // Initialize database with error handling
+            this.db = new sqlite3.Database(this.dbPath, (err) => {
+                if (err) {
+                    this.logger.error('Failed to open SQLite database:', err);
+                    throw err;
+                }
+            });
 
             // Create tables
             await this.createTables();
@@ -81,14 +88,18 @@ class SQLiteManager {
             ];
 
             let completed = 0;
-            queries.forEach(query => {
+            let hasError = false;
+
+            queries.forEach((query, index) => {
                 this.db.run(query, err => {
-                    if (err) {
+                    if (err && !hasError) {
+                        hasError = true;
+                        this.logger.error(`Error creating table/index ${index}:`, err);
                         reject(err);
                         return;
                     }
                     completed++;
-                    if (completed === queries.length) {
+                    if (completed === queries.length && !hasError) {
                         resolve();
                     }
                 });
@@ -128,9 +139,29 @@ class SQLiteManager {
     }
 
     async ensureInitialized() {
-        if (!this.initialized) {
-            await this.initializeDatabase();
+        if (this.initialized) {
+            return;
+        }
+
+        // If already initializing, wait for the existing promise
+        if (this.initializing && this.initPromise) {
+            await this.initPromise;
+            return;
+        }
+
+        // Start initialization
+        this.initializing = true;
+        this.initPromise = this.initializeDatabase();
+
+        try {
+            await this.initPromise;
             this.initialized = true;
+        } catch (error) {
+            this.initializing = false;
+            this.initPromise = null;
+            throw error;
+        } finally {
+            this.initializing = false;
         }
     }
 

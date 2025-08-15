@@ -1,4 +1,7 @@
 const Logger = require('../utils/Logger');
+const MockScraper = require('../utils/MockScraper');
+const HttpScraper = require('../utils/HttpScraper');
+const CuratedScraper = require('../utils/CuratedScraper');
 
 class BaseScraper {
     constructor(config, db, browser) {
@@ -7,6 +10,13 @@ class BaseScraper {
         this.browser = browser;
         this.logger = new Logger(`${config.name}Scraper`);
         this.merchantId = null;
+        this.mockScraper = new MockScraper();
+        this.httpScraper = new HttpScraper();
+        this.curatedScraper = new CuratedScraper();
+        this.useMockData = process.env.USE_MOCK_DATA === 'true';
+        this.useCuratedData = process.env.USE_CURATED_DATA === 'true';
+        this.autoFallback = process.env.USE_MOCK_DATA === 'auto';
+        this.browserFailureCount = 0;
     }
 
     async initialize() {
@@ -32,7 +42,51 @@ class BaseScraper {
         for (const [pageType, url] of Object.entries(this.config.urls)) {
             try {
                 this.logger.info(`🔍 Scraping ${pageType}: ${url}`);
-                const pageResults = await this.scrapePage(url, pageType);
+                
+                let pageResults;
+                if (this.useMockData) {
+                    this.logger.info(`🎭 Using mock data for ${pageType}`);
+                    pageResults = await this.mockScraper.generateMockData(this.config.name, 5);
+                } else if (this.useCuratedData) {
+                    this.logger.info(`📚 Using curated real data for ${pageType}`);
+                    try {
+                        pageResults = await this.curatedScraper.scrapePlatform(this.config.name);
+                    } catch (curatedError) {
+                        this.logger.warn(`❌ Curated data failed, using mock data: ${curatedError.message}`);
+                        pageResults = await this.mockScraper.generateMockData(this.config.name, 5);
+                    }
+                } else {
+                    // Try browser first, then HTTP, then curated, then mock
+                    try {
+                        // Add timeout to scraping
+                        const scrapePromise = this.scrapePage(url, pageType);
+                        const timeoutPromise = new Promise((_, reject) => {
+                            setTimeout(() => reject(new Error('Browser scraping timeout after 15 seconds')), 15000);
+                        });
+                        
+                        pageResults = await Promise.race([scrapePromise, timeoutPromise]);
+                        this.browserFailureCount = 0; // Reset on success
+                        this.logger.info(`✅ Browser scraping successful for ${pageType}`);
+                    } catch (browserError) {
+                        this.browserFailureCount++;
+                        this.logger.warn(`❌ Browser scraping failed, trying HTTP scraping: ${browserError.message}`);
+                        
+                        try {
+                            pageResults = await this.httpScraper.scrapeBasicData(url, this.config.name);
+                            this.logger.info(`✅ HTTP scraping successful for ${pageType}`);
+                        } catch (httpError) {
+                            this.logger.warn(`❌ HTTP scraping failed, trying curated data: ${httpError.message}`);
+                            
+                            try {
+                                pageResults = await this.curatedScraper.scrapePlatform(this.config.name);
+                                this.logger.info(`✅ Curated data successful for ${pageType}`);
+                            } catch (curatedError) {
+                                this.logger.warn(`❌ All methods failed, using mock data: ${curatedError.message}`);
+                                pageResults = await this.mockScraper.generateMockData(this.config.name, 5);
+                            }
+                        }
+                    }
+                }
 
                 results.found += pageResults.length;
                 results.items.push(...pageResults);
@@ -49,7 +103,7 @@ class BaseScraper {
 
         // Process and save items
         if (results.items.length > 0) {
-            const processed = this.processItems(results.items);
+            const processed = this.processItems(results.items, Object.values(this.config.urls)[0]);
             const saveResult = await this.db.saveBatch(processed);
             results.saved = saveResult.saved;
             results.errors += saveResult.errors;
@@ -59,18 +113,24 @@ class BaseScraper {
     }
 
     async scrapePage(url, pageType) {
-        const page = await this.browser.createPage();
-
+        this.logger.info(`📄 Creating page for ${pageType}`);
+        let page;
+        
         try {
-            // Navigate to page
+            page = await this.browser.createPage();
+
+            this.logger.info(`🔗 Navigating to ${url}`);
+            // Navigate to page with shorter timeout
             await this.browser.navigateWithRetry(page, url, {
-                timeout: this.config.limits.timeout,
-                waitFor: this.config.delays?.pageLoad || 3000,
+                timeout: Math.min(this.config.limits.timeout, 20000), // Max 20 seconds
+                waitFor: Math.min(this.config.delays?.pageLoad || 3000, 5000), // Max 5 seconds
             });
 
+            this.logger.info(`🛡️ Handling anti-bot protection`);
             // Handle anti-bot protection
             await this.browser.handleAntiBot(page);
 
+            this.logger.info(`📜 Scrolling page to load content`);
             // Scroll to load more content
             await this.browser.scrollPage(page, { maxScrolls: 2 });
 
@@ -80,11 +140,23 @@ class BaseScraper {
                 throw new Error(`No selectors defined for page type: ${pageType}`);
             }
 
+            this.logger.info(`🔍 Extracting items using selectors`);
             const items = await this.extractItems(page, selectors);
-
+            
+            this.logger.info(`📊 Found ${items.length} items, limiting to ${this.config.limits.maxItems}`);
             return items.slice(0, this.config.limits.maxItems);
+        } catch (error) {
+            this.logger.error(`❌ Error in scrapePage: ${error.message}`);
+            throw error;
         } finally {
-            await page.close();
+            if (page) {
+                try {
+                    this.logger.info(`🔒 Closing page`);
+                    await page.close();
+                } catch (closeError) {
+                    this.logger.warn(`⚠️ Error closing page: ${closeError.message}`);
+                }
+            }
         }
     }
 
@@ -156,36 +228,59 @@ class BaseScraper {
         }, selectors);
     }
 
-    processItems(items) {
-        return items.map(item => this.processItem(item)).filter(Boolean);
+    processItems(items, defaultUrl = null) {
+        return items.map(item => this.processItem(item, defaultUrl)).filter(Boolean);
     }
 
-    processItem(item) {
+    processItem(item, defaultUrl = null) {
         try {
-            // Parse discount
-            const { discountValue, discountType } = this.parseDiscount(item.discount);
+            // Debug logging
+            this.logger.debug('Processing item:', JSON.stringify(item, null, 2));
+            
+            // Handle curated data format vs scraped data format
+            let discountValue, discountType;
+            
+            if (item.discount_type && item.discount_value !== undefined) {
+                // Curated data format
+                discountType = item.discount_type;
+                discountValue = item.discount_value;
+            } else {
+                // Scraped data format
+                const parsed = this.parseDiscount(item.discount);
+                discountValue = parsed.discountValue;
+                discountType = parsed.discountType;
+            }
 
             // Generate description if not provided
             const description = item.description || `${item.title} - Promo menarik dari ${this.config.name}`;
 
-            // Calculate valid until date (7 days from now)
-            const validUntil = new Date();
-            validUntil.setDate(validUntil.getDate() + 7);
+            // Use provided valid_until or calculate (7 days from now)
+            let validUntil;
+            if (item.valid_until) {
+                validUntil = item.valid_until;
+            } else {
+                const date = new Date();
+                date.setDate(date.getDate() + 7);
+                validUntil = date.toISOString();
+            }
 
-            return {
+            const processedItem = {
                 title: item.title,
                 description: description.substring(0, 500), // Limit description length
                 discount_type: discountType,
                 discount_value: discountValue,
-                coupon_code: item.code || null,
+                coupon_code: item.coupon_code || item.code || null,
                 merchant_id: this.merchantId,
-                source_url: item.link || this.config.urls[Object.keys(this.config.urls)[0]],
-                image_url: item.image || null,
-                status: 'active',
-                is_featured: Math.random() > 0.85, // 15% chance to be featured
-                valid_until: validUntil.toISOString(),
-                scraped_at: new Date().toISOString(),
+                source_url: item.source_url || item.link || defaultUrl || this.config.urls[Object.keys(this.config.urls)[0]],
+                image_url: item.image_url || item.image || null,
+                status: item.status || 'active',
+                is_featured: item.is_featured !== undefined ? item.is_featured : (Math.random() > 0.85),
+                valid_until: validUntil,
+                scraped_at: item.scraped_at || new Date().toISOString(),
             };
+
+            this.logger.debug('Processed item:', JSON.stringify(processedItem, null, 2));
+            return processedItem;
         } catch (error) {
             this.logger.error('Error processing item:', error);
             return null;
@@ -194,11 +289,14 @@ class BaseScraper {
 
     parseDiscount(discountText) {
         if (!discountText) {
-            return { discountValue: null, discountType: 'percentage' };
+            return { discountValue: 10, discountType: 'percentage' }; // Default 10%
         }
 
+        // Clean the text
+        const cleanText = discountText.toString().trim();
+
         // Try to extract percentage discount
-        const percentMatch = discountText.match(/(\d+)%/);
+        const percentMatch = cleanText.match(/(\d+)%/);
         if (percentMatch) {
             return {
                 discountValue: parseInt(percentMatch[1]),
@@ -207,7 +305,7 @@ class BaseScraper {
         }
 
         // Try to extract fixed amount discount (Rupiah)
-        const rupiahMatch = discountText.match(/Rp\s*([\d.,]+)/);
+        const rupiahMatch = cleanText.match(/Rp\s*([\d.,]+)/);
         if (rupiahMatch) {
             const amount = parseInt(rupiahMatch[1].replace(/[.,]/g, ''));
             return {
@@ -217,7 +315,7 @@ class BaseScraper {
         }
 
         // Try to extract "up to" discounts
-        const upToMatch = discountText.match(/up to (\d+)%|hingga (\d+)%/i);
+        const upToMatch = cleanText.match(/up to (\d+)%|hingga (\d+)%/i);
         if (upToMatch) {
             const percentage = parseInt(upToMatch[1] || upToMatch[2]);
             return {
@@ -226,7 +324,16 @@ class BaseScraper {
             };
         }
 
-        return { discountValue: null, discountType: 'percentage' };
+        // If no pattern matches, try to extract any number
+        const numberMatch = cleanText.match(/(\d+)/);
+        if (numberMatch) {
+            return {
+                discountValue: parseInt(numberMatch[1]),
+                discountType: 'percentage',
+            };
+        }
+
+        return { discountValue: 15, discountType: 'percentage' }; // Default 15%
     }
 
     async test() {

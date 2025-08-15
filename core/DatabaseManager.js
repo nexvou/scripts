@@ -16,8 +16,11 @@ class DatabaseManager {
             this.merchantCache = new Map();
             this.logger.info('Using Supabase database (production)');
         } else {
-            // Use SQLite in development/local
-            this.sqlite = new SQLiteManager();
+            // Use SQLite in development/local - use singleton
+            if (!DatabaseManager.sqliteInstance) {
+                DatabaseManager.sqliteInstance = new SQLiteManager();
+            }
+            this.sqlite = DatabaseManager.sqliteInstance;
             this.logger.info('Using SQLite database (development)');
         }
     }
@@ -291,6 +294,13 @@ class DatabaseManager {
     close() {
         if (!this.isProduction && this.sqlite) {
             this.sqlite.close();
+        }
+    }
+
+    static clearSqliteInstance() {
+        if (DatabaseManager.sqliteInstance) {
+            DatabaseManager.sqliteInstance.close();
+            DatabaseManager.sqliteInstance = null;
         }
     }
 }

@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "name": "ecommerce-coupon-scraper",
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 300
+    }
+  },
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "crons": [
+    {
+      "path": "/api/scrape/trigger",
+      "schedule": "*/1 * * * *"
+    }
+  ]
+}
