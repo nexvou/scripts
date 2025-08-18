@@ -1,13 +1,13 @@
-# 🛒 E-Commerce Coupon Scraper
+# 🛒 Nexvou Scraper
 
 A powerful, scalable, and production-ready coupon scraping system for major e-commerce platforms in Indonesia.
 
 ## 🚀 Features
 
 - **Multi-Platform Support**: Shopee, Tokopedia, Lazada, Blibli, Traveloka, Grab
-- **Real-Time Data**: 100% valid coupon data scraped in real-time
-- **Multiple Database Support**: MySQL, PostgreSQL, SQLite, Supabase
-- **Auto-Refresh**: Data refreshes every 1 minute
+- **Smart Fallback System**: HTTP scraping → Browser scraping → Mock data
+- **Multiple Database Support**: MySQL, PostgreSQL, SQLite
+- **Robust Browser Support**: Puppeteer with Brave/Chrome integration
 - **Vercel Ready**: Optimized for serverless deployment
 - **Scalable Architecture**: Clean, modular, and easy to extend
 - **Production Grade**: Error handling, logging, monitoring
@@ -15,27 +15,29 @@ A powerful, scalable, and production-ready coupon scraping system for major e-co
 ## 📁 Project Structure
 
 ```
-├── src/
-│   ├── config/           # Configuration files
-│   ├── database/         # Database adapters and migrations
-│   ├── scrapers/         # Platform-specific scrapers
-│   ├── services/         # Business logic services
-│   ├── utils/            # Utility functions
-│   └── types/            # TypeScript definitions
-├── api/                  # Vercel API endpoints
-├── migrations/           # Database migrations
-├── tests/               # Test files
-└── docs/                # Documentation
+├── config/              # Configuration files
+├── core/                # Core system components
+│   ├── BrowserManager.js    # Browser automation
+│   ├── ScraperManager.js    # Scraping orchestration
+│   └── SQLiteManager.js     # Database management
+├── scrapers/            # Platform-specific scrapers
+├── utils/               # Utility functions
+├── api/                 # Vercel API endpoints
+├── migrations/          # Database migrations
+├── tests/              # Test files
+├── docs/               # Documentation
+└── index.js            # Main entry point
 ```
 
 ## 🛠️ Tech Stack
 
-- **Runtime**: Node.js with Bun
-- **Language**: JavaScript/TypeScript
-- **Database**: Multi-adapter (MySQL, PostgreSQL, SQLite, Supabase)
+- **Runtime**: Node.js (compatible with Bun)
+- **Language**: JavaScript (CommonJS)
+- **Database**: SQLite (primary), MySQL, PostgreSQL support
+- **Browser**: Puppeteer with Brave Browser integration
 - **Deployment**: Vercel Serverless
-- **Scraping**: Puppeteer + Playwright fallback
-- **Monitoring**: Built-in logging and metrics
+- **Scraping**: HTTP-first with browser fallback
+- **Monitoring**: Winston logging with structured output
 
 ## 🚀 Quick Start
 
@@ -43,27 +45,37 @@ A powerful, scalable, and production-ready coupon scraping system for major e-co
 
     ```bash
     git clone <repo>
-    cd ecommerce-coupon-scraper
-    bun install
+    cd scripts
+    npm install
     ```
 
 2. **Configure Environment**
 
     ```bash
     cp .env.example .env
-    # Edit .env with your database credentials
+    # Edit .env with your database credentials (optional for SQLite)
     ```
 
-3. **Run Migrations**
+3. **Run Database Setup**
 
     ```bash
-    bun run migrate
+    npm run migrate
     ```
 
 4. **Start Scraping**
 
     ```bash
-    bun run scrape
+    # Run all scrapers
+    npm start
+
+    # Run single platform
+    npm start -- --single shopee
+
+    # Run tests
+    npm start -- --test
+
+    # Run with scheduling
+    npm start -- --schedule
     ```
 
 5. **Deploy to Vercel**
@@ -92,24 +104,61 @@ A powerful, scalable, and production-ready coupon scraping system for major e-co
 
 ### Scraping Configuration
 
-- Refresh interval: 1 minute (configurable)
-- Concurrent scrapers: 5 (configurable)
-- Timeout: 30 seconds per platform
-- Retry attempts: 3
+- Refresh interval: 15 minutes (configurable in `config/scraper.config.js`)
+- Platform delays: 2 seconds between platforms
+- Timeout: 15-30 seconds per platform
+- Retry attempts: 2 for browser, fallback to mock data
+- Smart fallback: HTTP → Browser → Mock data
 
-## 📈 Monitoring
+## 📈 Current Status
 
-- Real-time scraping metrics
-- Error tracking and alerts
-- Performance monitoring
-- Data quality validation
+### Working Platforms ✅
 
-## 🔒 Security
+- **Shopee**: 9 items per run (HTTP scraping)
+- **Lazada**: 6 items per run (HTTP scraping)
+- **Traveloka**: 3 items per run (HTTP scraping)
 
-- Rate limiting
-- User agent rotation
-- Proxy support
-- Anti-bot detection handling
+### Mock Data Platforms 🎭
+
+- **Tokopedia**: 15 items per run (smart mock data)
+- **Blibli**: 15 items per run (smart mock data)
+- **Grab**: 10 items per run (smart mock data)
+
+### Performance Metrics
+
+- **Total items per run**: ~58 items
+- **Execution time**: ~3-4 minutes
+- **Success rate**: 100% (with fallbacks)
+- **Browser compatibility**: Brave, Chrome, Puppeteer Chrome
+
+## 🔒 Anti-Detection Features
+
+- **User agent rotation**: 5 different realistic user agents
+- **Smart delays**: Random delays between requests
+- **Stealth mode**: Removes automation indicators
+- **Browser fingerprinting**: Mimics real browser behavior
+- **Fallback system**: HTTP → Browser → Mock data
+- **Rate limiting**: Configurable delays between platforms
+
+## 💻 Command Line Usage
+
+```bash
+# Run all scrapers
+node index.js
+
+# Run single platform
+node index.js --single shopee
+node index.js --single tokopedia
+
+# Run system tests
+node index.js --test
+
+# Run with scheduling (cron)
+node index.js --schedule
+
+# Show help
+node index.js --help
+```
 
 ## 📝 API Endpoints
 
@@ -118,21 +167,31 @@ A powerful, scalable, and production-ready coupon scraping system for major e-co
 - `GET /api/metrics` - Get scraping metrics
 - `POST /api/scrape/trigger` - Trigger manual scrape
 
+See [API Documentation](./docs/api.md) for detailed endpoint documentation.
+
 ## 🧪 Testing
 
 ```bash
-bun test                 # Run all tests
-bun test:unit           # Unit tests only
-bun test:integration    # Integration tests
-bun test:e2e           # End-to-end tests
+npm test                # Run all tests
+npm run test:unit       # Unit tests only
+npm run test:integration # Integration tests
+npm run test:e2e        # End-to-end tests
+
+# Manual testing
+node index.js --test    # Test all scrapers
+node test-browser.js    # Test browser setup
 ```
 
 ## 📚 Documentation
 
 - [API Documentation](./docs/api.md)
-- [Database Schema](./docs/database.md)
-- [Deployment Guide](./docs/deployment.md)
-- [Contributing](./docs/contributing.md)
+- [Database Schema](./docs/DATABASE.md)
+- [Core Architecture](./docs/CORE.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+- [Development Guide](./docs/DEVELOPMENT.md)
+- [Scraper Details](./docs/SCRAPERS.md)
+- [Troubleshooting](./docs/TROUBLESHOOTING.md)
+- [Contributing Guide](./docs/CONTRIBUTING.md)
 
 ## 🤝 Contributing
 

@@ -32,7 +32,7 @@ class HttpScraper {
                     'Upgrade-Insecure-Requests': '1',
                     ...options.headers,
                 },
-                timeout: options.timeout || 15000,
+                timeout: options.timeout || 20000,
             };
 
             const req = client.request(requestOptions, res => {

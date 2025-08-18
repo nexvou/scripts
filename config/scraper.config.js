@@ -1,9 +1,9 @@
 module.exports = {
     // Global settings
     delays: {
-        betweenPlatforms: 5000,
-        betweenRequests: 2000,
-        pageLoad: 3000,
+        betweenPlatforms: 2000, // Reduced from 5000
+        betweenRequests: 1000, // Reduced from 2000
+        pageLoad: 1000, // Reduced from 3000
     },
 
     // Cron schedules
@@ -54,9 +54,9 @@ module.exports = {
             slug: 'tokopedia',
             enabled: true,
             urls: {
-                promo: 'https://www.tokopedia.com/promo',
-                flashSale: 'https://www.tokopedia.com/flash-sale',
-                deals: 'https://www.tokopedia.com/deals',
+                promo: 'https://www.tokopedia.com/discovery/deals',
+                flashSale: 'https://www.tokopedia.com/discovery/flash-sale',
+                deals: 'https://www.tokopedia.com/discovery/deals',
             },
             selectors: {
                 promo: {
@@ -87,7 +87,7 @@ module.exports = {
             slug: 'lazada',
             enabled: true,
             urls: {
-                flashSale: 'https://www.lazada.co.id/flash-sale/',
+                flashSale: 'https://www.lazada.co.id/shop-flash-sale/',
                 vouchers: 'https://www.lazada.co.id/vouchers/',
                 brands: 'https://www.lazada.co.id/brands/',
             },
@@ -179,8 +179,8 @@ module.exports = {
             slug: 'grab',
             enabled: true,
             urls: {
-                food: 'https://food.grab.com/id/id/promos',
-                mart: 'https://mart.grab.com/id/promos',
+                food: 'https://food.grab.com/id/en/promos',
+                mart: 'https://www.grab.com/id/food/',
             },
             selectors: {
                 food: {

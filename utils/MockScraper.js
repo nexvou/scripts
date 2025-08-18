@@ -5,22 +5,22 @@ class MockScraper {
         this.logger = new Logger('MockScraper');
     }
 
-    async generateMockData(platform, count = 10) {
+    async generateMockData(platform, count = 5) {
         this.logger.info(`🎭 Generating ${count} mock items for ${platform}`);
 
         const mockItems = [];
-        const discounts = ['10%', '20%', '30%', '50%', 'Rp 50.000', 'Rp 100.000'];
+        const discounts = ['15%', '25%', '35%', '45%', 'Rp 75.000', 'Rp 150.000'];
         const titles = [
-            'Flash Sale Elektronik',
-            'Diskon Besar Fashion',
-            'Promo Makanan Enak',
-            'Cashback Belanja',
-            'Gratis Ongkir',
-            'Buy 1 Get 1',
-            'Weekend Sale',
-            'Mega Sale',
-            'Special Offer',
-            'Limited Time Deal',
+            `${platform} Flash Sale Spesial`,
+            `Diskon Besar ${platform}`,
+            `Promo Eksklusif ${platform}`,
+            `${platform} Cashback`,
+            `Gratis Ongkir ${platform}`,
+            `${platform} Weekend Sale`,
+            `Mega Sale ${platform}`,
+            `${platform} Special Offer`,
+            `Limited Deal ${platform}`,
+            `${platform} Hot Deals`,
         ];
 
         // Platform-specific URLs and images

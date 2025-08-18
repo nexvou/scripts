@@ -18,7 +18,7 @@ class KuponScraper {
     }
 
     async start() {
-        this.logger.info('🚀 Starting Kupon.id Scraper System');
+        this.logger.info('🚀 Starting Nexvou Scraper System');
 
         try {
             // Parse command line arguments

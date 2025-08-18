@@ -1,12 +1,11 @@
 {
-    "name": "ecommerce-coupon-scraper",
+    "name": "nexvou-scripts",
     "version": "1.0.0",
     "description": "Production-ready e-commerce coupon scraper for Indonesian platforms",
-    "main": "src/index.js",
-    "type": "module",
+    "main": "index.js",
     "scripts": {
-        "start": "node src/index.js",
-        "dev": "nodemon src/index.js",
+        "start": "node index.js",
+        "dev": "nodemon index.js",
         "scrape": "node src/cli/scrape.js",
         "scrape:single": "node src/cli/scrape.js --platform",
         "migrate": "node src/cli/migrate.js",
@@ -33,7 +32,7 @@
         "vercel",
         "serverless"
     ],
-    "author": "Your Name",
+    "author": "Nexvou Scraper",
     "license": "MIT",
     "dependencies": {
         "@supabase/supabase-js": "^2.39.0",
@@ -46,7 +45,8 @@
         "node-cron": "^3.0.3",
         "pg": "^8.11.3",
         "playwright": "^1.40.0",
-        "puppeteer": "^21.11.0",
+        "puppeteer": "^24.16.2",
+        "puppeteer-core": "^24.16.2",
         "sqlite3": "^5.1.6",
         "uuid": "^9.0.1",
         "winston": "^3.11.0"
@@ -66,12 +66,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/yourusername/ecommerce-coupon-scraper.git"
+        "url": "https://github.com/nexvou/scripts.git"
     },
     "bugs": {
-        "url": "https://github.com/yourusername/ecommerce-coupon-scraper/issues"
+        "url": "https://github.com/nexvou/scripts/issues"
     },
-    "homepage": "https://github.com/yourusername/ecommerce-coupon-scraper#readme",
+    "homepage": "https://github.com/nexvou/scripts#readme",
     "lint-staged": {
         "*.js": [
             "eslint --fix",
