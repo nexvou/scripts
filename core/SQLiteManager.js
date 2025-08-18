@@ -6,7 +6,8 @@ const Logger = require('../utils/Logger');
 class SQLiteManager {
     constructor() {
         this.logger = new Logger('SQLiteManager');
-        this.dbPath = path.join(process.cwd(), 'data', 'scraper.db');
+        // Use the same database path as configured in .env
+        this.dbPath = process.env.SQLITE_PATH || path.join(process.cwd(), 'data', 'ecommerce_coupons.db');
         this.db = null;
         this.merchantCache = new Map();
         this.initialized = false;

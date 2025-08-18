@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const SQLiteManager = require('./SQLiteManager');
 const Logger = require('../utils/Logger');
