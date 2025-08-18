@@ -10,7 +10,7 @@
         "scrape:single": "node src/cli/scrape.js --platform",
         "migrate": "node src/cli/migrate.js",
         "seed": "node src/cli/seed.js",
-        "test": "jest --passWithNoTests",
+        "test": "node --experimental-vm-modules node_modules/.bin/jest --passWithNoTests",
         "test:unit": "jest --testPathPattern=tests/unit",
         "test:integration": "jest --testPathPattern=tests/integration",
         "test:e2e": "jest --testPathPattern=tests/e2e",

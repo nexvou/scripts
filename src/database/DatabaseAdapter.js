@@ -7,6 +7,7 @@ import knex from 'knex';
 import { createClient } from '@supabase/supabase-js';
 import Logger from '../utils/Logger.js';
 import dbConfig from '../config/database.js';
+import DatabaseInitializer from './DatabaseInitializer.js';
 
 class DatabaseAdapter {
     constructor() {
@@ -14,10 +15,14 @@ class DatabaseAdapter {
         this.adapter = dbConfig.adapter;
         this.connection = null;
         this.supabase = null;
+        this.initializer = new DatabaseInitializer();
     }
 
     async connect() {
         try {
+            // Initialize database setup before connecting
+            await this.initializeDatabase();
+
             this.logger.info(`🔌 Connecting to ${this.adapter} database...`);
 
             switch (this.adapter) {
@@ -333,6 +338,14 @@ class DatabaseAdapter {
             totalActiveCoupons: totalCoupons.count,
             totalActivePlatforms: totalPlatforms.count,
         };
+    }
+
+    /**
+     * Initialize database setup before connection
+     */
+    async initializeDatabase() {
+        const config = dbConfig.connections[this.adapter];
+        await this.initializer.initializeForAdapter(this.adapter, config);
     }
 
     async close() {

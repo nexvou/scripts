@@ -8,8 +8,8 @@ Thank you for your interest in contributing to the E-Commerce Coupon Scraper!
 2. **Clone your fork**
 
     ```bash
-    git clone https://github.com/your-username/ecommerce-coupon-scraper.git
-    cd ecommerce-coupon-scraper
+    git clone https://github.com/nexvou/scripts.git
+    cd scripts
     ```
 
 3. **Install dependencies**
