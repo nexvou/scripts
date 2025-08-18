@@ -119,4 +119,4 @@ class AntiDetection {
     }
 }
 
-module.exports = AntiDetection;
+export default AntiDetection;

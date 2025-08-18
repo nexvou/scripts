@@ -5,9 +5,9 @@
  * Usage: node src/cli/scrape.js [--platform shopee]
  */
 
-const { Command } = require('commander');
-const ScraperService = require('../services/ScraperService');
-const Logger = require('../utils/Logger');
+import { Command } from 'commander';
+import ScraperService from '../services/ScraperService.js';
+import Logger from '../utils/Logger.js';
 
 const program = new Command();
 const logger = new Logger('CLI');

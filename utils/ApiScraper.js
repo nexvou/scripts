@@ -11,18 +11,17 @@ class ApiScraper {
             // Shopee public API endpoints (these are real endpoints)
             const endpoints = [
                 'https://shopee.co.id/api/v4/recommend/recommend',
-                'https://shopee.co.id/api/v2/flash_sale/get_items'
+                'https://shopee.co.id/api/v2/flash_sale/get_items',
             ];
 
             const deals = [];
-            
+
             // Note: Real Shopee API requires proper headers and authentication
             // This is a simplified example
             this.logger.info('🛒 Attempting to fetch Shopee deals...');
-            
+
             // For now, return realistic mock data based on actual Shopee structure
             return this.generateRealisticShopeeData();
-            
         } catch (error) {
             this.logger.error('❌ Shopee API scraping failed:', error.message);
             throw error;
@@ -49,7 +48,7 @@ class ApiScraper {
                 originalPrice: 'Rp 5.999.000',
                 image: 'https://cf.shopee.co.id/file/7cb930d1bd183a435f4fb3e5cc4a896c',
                 link: 'https://shopee.co.id/flash_sale',
-                code: 'FLASHSALE50'
+                code: 'FLASHSALE50',
             },
             {
                 title: 'Gratis Ongkir Tanpa Minimum - Fashion Wanita',
@@ -58,7 +57,7 @@ class ApiScraper {
                 price: 'Mulai Rp 25.000',
                 image: 'https://cf.shopee.co.id/file/fashion-banner-2024',
                 link: 'https://shopee.co.id/daily-discover',
-                code: 'GRATISONGKIR'
+                code: 'GRATISONGKIR',
             },
             {
                 title: 'Cashback 100% - Produk Kecantikan',
@@ -67,8 +66,8 @@ class ApiScraper {
                 price: 'Rp 150.000',
                 image: 'https://cf.shopee.co.id/file/beauty-cashback-banner',
                 link: 'https://shopee.co.id/brands',
-                code: 'BEAUTYBACK100'
-            }
+                code: 'BEAUTYBACK100',
+            },
         ];
 
         return realDeals;
@@ -83,7 +82,7 @@ class ApiScraper {
                 price: 'Mulai Rp 99.000',
                 image: 'https://images.tokopedia.net/img/cache/500-square/VqbcmM/2024/1/15/kejar-diskon-elektronik.jpg',
                 link: 'https://www.tokopedia.com/promo',
-                code: 'KEJARDISKON70'
+                code: 'KEJARDISKON70',
             },
             {
                 title: 'Plus Cashback Extra - Semua Kategori',
@@ -92,8 +91,8 @@ class ApiScraper {
                 price: 'Min. Belanja Rp 1.000.000',
                 image: 'https://images.tokopedia.net/img/cache/500-square/VqbcmM/2024/1/15/plus-cashback.jpg',
                 link: 'https://www.tokopedia.com/deals',
-                code: 'PLUSCASHBACK'
-            }
+                code: 'PLUSCASHBACK',
+            },
         ];
 
         return realDeals;

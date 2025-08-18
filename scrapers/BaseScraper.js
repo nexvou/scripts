@@ -42,7 +42,7 @@ class BaseScraper {
         for (const [pageType, url] of Object.entries(this.config.urls)) {
             try {
                 this.logger.info(`🔍 Scraping ${pageType}: ${url}`);
-                
+
                 let pageResults;
                 if (this.useMockData) {
                     this.logger.info(`🎭 Using mock data for ${pageType}`);
@@ -63,20 +63,20 @@ class BaseScraper {
                         const timeoutPromise = new Promise((_, reject) => {
                             setTimeout(() => reject(new Error('Browser scraping timeout after 15 seconds')), 15000);
                         });
-                        
+
                         pageResults = await Promise.race([scrapePromise, timeoutPromise]);
                         this.browserFailureCount = 0; // Reset on success
                         this.logger.info(`✅ Browser scraping successful for ${pageType}`);
                     } catch (browserError) {
                         this.browserFailureCount++;
                         this.logger.warn(`❌ Browser scraping failed, trying HTTP scraping: ${browserError.message}`);
-                        
+
                         try {
                             pageResults = await this.httpScraper.scrapeBasicData(url, this.config.name);
                             this.logger.info(`✅ HTTP scraping successful for ${pageType}`);
                         } catch (httpError) {
                             this.logger.warn(`❌ HTTP scraping failed, trying curated data: ${httpError.message}`);
-                            
+
                             try {
                                 pageResults = await this.curatedScraper.scrapePlatform(this.config.name);
                                 this.logger.info(`✅ Curated data successful for ${pageType}`);
@@ -115,7 +115,7 @@ class BaseScraper {
     async scrapePage(url, pageType) {
         this.logger.info(`📄 Creating page for ${pageType}`);
         let page;
-        
+
         try {
             page = await this.browser.createPage();
 
@@ -142,7 +142,7 @@ class BaseScraper {
 
             this.logger.info(`🔍 Extracting items using selectors`);
             const items = await this.extractItems(page, selectors);
-            
+
             this.logger.info(`📊 Found ${items.length} items, limiting to ${this.config.limits.maxItems}`);
             return items.slice(0, this.config.limits.maxItems);
         } catch (error) {
@@ -236,10 +236,10 @@ class BaseScraper {
         try {
             // Debug logging
             this.logger.debug('Processing item:', JSON.stringify(item, null, 2));
-            
+
             // Handle curated data format vs scraped data format
             let discountValue, discountType;
-            
+
             if (item.discount_type && item.discount_value !== undefined) {
                 // Curated data format
                 discountType = item.discount_type;
@@ -271,10 +271,11 @@ class BaseScraper {
                 discount_value: discountValue,
                 coupon_code: item.coupon_code || item.code || null,
                 merchant_id: this.merchantId,
-                source_url: item.source_url || item.link || defaultUrl || this.config.urls[Object.keys(this.config.urls)[0]],
+                source_url:
+                    item.source_url || item.link || defaultUrl || this.config.urls[Object.keys(this.config.urls)[0]],
                 image_url: item.image_url || item.image || null,
                 status: item.status || 'active',
-                is_featured: item.is_featured !== undefined ? item.is_featured : (Math.random() > 0.85),
+                is_featured: item.is_featured !== undefined ? item.is_featured : Math.random() > 0.85,
                 valid_until: validUntil,
                 scraped_at: item.scraped_at || new Date().toISOString(),
             };

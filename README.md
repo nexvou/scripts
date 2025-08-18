@@ -40,36 +40,41 @@ A powerful, scalable, and production-ready coupon scraping system for major e-co
 ## 🚀 Quick Start
 
 1. **Clone & Install**
-   ```bash
-   git clone <repo>
-   cd ecommerce-coupon-scraper
-   bun install
-   ```
+
+    ```bash
+    git clone <repo>
+    cd ecommerce-coupon-scraper
+    bun install
+    ```
 
 2. **Configure Environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your database credentials
-   ```
+
+    ```bash
+    cp .env.example .env
+    # Edit .env with your database credentials
+    ```
 
 3. **Run Migrations**
-   ```bash
-   bun run migrate
-   ```
+
+    ```bash
+    bun run migrate
+    ```
 
 4. **Start Scraping**
-   ```bash
-   bun run scrape
-   ```
+
+    ```bash
+    bun run scrape
+    ```
 
 5. **Deploy to Vercel**
-   ```bash
-   vercel deploy
-   ```
+    ```bash
+    vercel deploy
+    ```
 
 ## 📊 Database Schema
 
 ### Tables
+
 - `platforms` - E-commerce platform configurations
 - `merchants` - Merchant/brand information
 - `coupons` - Coupon and promotion data
@@ -79,12 +84,14 @@ A powerful, scalable, and production-ready coupon scraping system for major e-co
 ## 🔧 Configuration
 
 ### Database Adapters
+
 - MySQL: `mysql://user:pass@host:port/db`
 - PostgreSQL: `postgresql://user:pass@host:port/db`
 - SQLite: `sqlite://./data/coupons.db`
 - Supabase: `supabase://project:key@api.supabase.co`
 
 ### Scraping Configuration
+
 - Refresh interval: 1 minute (configurable)
 - Concurrent scrapers: 5 (configurable)
 - Timeout: 30 seconds per platform

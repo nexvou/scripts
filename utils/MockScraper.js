@@ -7,7 +7,7 @@ class MockScraper {
 
     async generateMockData(platform, count = 10) {
         this.logger.info(`🎭 Generating ${count} mock items for ${platform}`);
-        
+
         const mockItems = [];
         const discounts = ['10%', '20%', '30%', '50%', 'Rp 50.000', 'Rp 100.000'];
         const titles = [
@@ -20,53 +20,53 @@ class MockScraper {
             'Weekend Sale',
             'Mega Sale',
             'Special Offer',
-            'Limited Time Deal'
+            'Limited Time Deal',
         ];
 
         // Platform-specific URLs and images
         const platformData = {
-            'Shopee': {
+            Shopee: {
                 baseUrl: 'https://shopee.co.id',
                 imageDomain: 'https://cf.shopee.co.id/file',
-                paths: ['/flash-sale', '/daily-discover', '/brands']
+                paths: ['/flash-sale', '/daily-discover', '/brands'],
             },
-            'Tokopedia': {
+            Tokopedia: {
                 baseUrl: 'https://www.tokopedia.com',
                 imageDomain: 'https://images.tokopedia.net/img',
-                paths: ['/promo', '/flash-sale', '/deals']
+                paths: ['/promo', '/flash-sale', '/deals'],
             },
-            'Lazada': {
+            Lazada: {
                 baseUrl: 'https://www.lazada.co.id',
                 imageDomain: 'https://id-live-01.slatic.net/p',
-                paths: ['/flash-sale', '/vouchers', '/brands']
+                paths: ['/flash-sale', '/vouchers', '/brands'],
             },
-            'Blibli': {
+            Blibli: {
                 baseUrl: 'https://www.blibli.com',
                 imageDomain: 'https://www.static-src.com/wcsstore',
-                paths: ['/deals', '/flash-sale', '/voucher']
+                paths: ['/deals', '/flash-sale', '/voucher'],
             },
-            'Traveloka': {
+            Traveloka: {
                 baseUrl: 'https://www.traveloka.com',
                 imageDomain: 'https://ik.imagekit.io/tvlk',
-                paths: ['/id-id/promotion', '/id-id/flight/promo', '/id-id/hotel/promo']
+                paths: ['/id-id/promotion', '/id-id/flight/promo', '/id-id/hotel/promo'],
             },
-            'Grab': {
+            Grab: {
                 baseUrl: 'https://www.grab.com',
                 imageDomain: 'https://d1sag4ddilekf6.cloudfront.net',
-                paths: ['/id/food/promos', '/id/mart/promos']
-            }
+                paths: ['/id/food/promos', '/id/mart/promos'],
+            },
         };
 
         const platformInfo = platformData[platform] || {
             baseUrl: `https://www.${platform.toLowerCase()}.com`,
             imageDomain: `https://images.${platform.toLowerCase()}.com`,
-            paths: ['/promo', '/deals', '/sale']
+            paths: ['/promo', '/deals', '/sale'],
         };
 
         for (let i = 0; i < count; i++) {
             const randomPath = platformInfo.paths[Math.floor(Math.random() * platformInfo.paths.length)];
             const itemId = Math.floor(Math.random() * 1000000);
-            
+
             mockItems.push({
                 title: `${titles[Math.floor(Math.random() * titles.length)]} ${i + 1}`,
                 description: `Promo menarik dari ${platform} dengan berbagai keuntungan`,
@@ -74,7 +74,7 @@ class MockScraper {
                 price: `Rp ${(Math.random() * 1000000 + 50000).toFixed(0)}`,
                 image: `${platformInfo.imageDomain}/${itemId}_300x300.jpg`,
                 link: `${platformInfo.baseUrl}${randomPath}/${itemId}`,
-                code: Math.random() > 0.5 ? `${platform.toUpperCase()}${Math.floor(Math.random() * 1000)}` : null
+                code: Math.random() > 0.5 ? `${platform.toUpperCase()}${Math.floor(Math.random() * 1000)}` : null,
             });
         }
 

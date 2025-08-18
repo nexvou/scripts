@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * CLI Tool for Database Migrations
- * Usage: node src/cli/migrate.js
+ * CLI Tool for Database Seeding
+ * Usage: node src/cli/seed.js
  */
 
 import dotenv from 'dotenv';
@@ -19,25 +19,25 @@ const projectRoot = join(__dirname, '../..');
 // Load environment variables with explicit path
 dotenv.config({ path: join(projectRoot, '.env') });
 
-const logger = new Logger('Migration');
+const logger = new Logger('Seeding');
 
-async function runMigrations() {
+async function runSeeds() {
     const database = new DatabaseAdapter();
 
     try {
-        logger.info('🚀 Starting database migrations...');
+        logger.info('🌱 Starting database seeding...');
 
         await database.connect();
-        await database.runMigrations();
+        await database.runSeeds();
 
-        logger.info('✅ Migrations completed successfully');
+        logger.info('✅ Seeding completed successfully');
 
         await database.close();
         process.exit(0);
     } catch (error) {
-        logger.error('❌ Migration failed:', error);
+        logger.error('❌ Seeding failed:', error);
         process.exit(1);
     }
 }
 
-runMigrations();
+runSeeds();

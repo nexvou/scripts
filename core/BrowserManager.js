@@ -19,7 +19,7 @@ class BrowserManager {
     async getBrowser() {
         if (!this.browser) {
             this.logger.info('🌐 Launching browser...');
-            
+
             try {
                 // Simplified configuration for better compatibility
                 const launchOptions = {
@@ -45,7 +45,7 @@ class BrowserManager {
                 // Try to use system Chrome first (more stable)
                 const fs = require('fs');
                 const systemChrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-                
+
                 if (fs.existsSync(systemChrome)) {
                     launchOptions.executablePath = systemChrome;
                     this.logger.info(`🔍 Using system Chrome: ${systemChrome}`);
@@ -53,7 +53,7 @@ class BrowserManager {
                     // Fallback to Puppeteer Chrome
                     const os = require('os');
                     const puppeteerChrome = `${os.homedir()}/.cache/puppeteer/chrome/mac-121.0.6167.85/chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`;
-                    
+
                     if (fs.existsSync(puppeteerChrome)) {
                         launchOptions.executablePath = puppeteerChrome;
                         this.logger.info(`🔍 Using Puppeteer Chrome: ${puppeteerChrome}`);
@@ -81,25 +81,25 @@ class BrowserManager {
 
     async createPage(options = {}) {
         const maxRetries = 2; // Reduce retries for faster failure
-        
+
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 this.logger.info(`📄 Creating new page (attempt ${attempt})...`);
-                
+
                 // Get browser with shorter timeout
                 const browserPromise = this.getBrowser();
                 const timeoutPromise = new Promise((_, reject) => {
                     setTimeout(() => reject(new Error('Browser creation timeout')), 10000); // 10 seconds
                 });
-                
+
                 const browser = await Promise.race([browserPromise, timeoutPromise]);
-                
+
                 // Create page with shorter timeout
                 const pagePromise = browser.newPage();
                 const pageTimeoutPromise = new Promise((_, reject) => {
                     setTimeout(() => reject(new Error('Page creation timeout')), 5000); // 5 seconds
                 });
-                
+
                 const page = await Promise.race([pagePromise, pageTimeoutPromise]);
 
                 this.logger.info('🔧 Configuring page settings...');
@@ -115,11 +115,11 @@ class BrowserManager {
                 return page;
             } catch (error) {
                 this.logger.error(`❌ Failed to create page (attempt ${attempt}):`, error.message);
-                
+
                 if (attempt === maxRetries) {
                     throw new Error(`Failed to create page after ${maxRetries} attempts: ${error.message}`);
                 }
-                
+
                 // Short wait before retry
                 await this.delay(1000);
             }

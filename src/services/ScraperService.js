@@ -3,12 +3,12 @@
  * Orchestrates scraping operations across all platforms
  */
 
-const cron = require('node-cron');
-const { v4: uuidv4 } = require('uuid');
-const Logger = require('../utils/Logger');
-const DatabaseAdapter = require('../database/DatabaseAdapter');
-const BaseScraper = require('../scrapers/BaseScraper');
-const scraperConfig = require('../config/scraper');
+import cron from 'node-cron';
+import { v4 as uuidv4 } from 'uuid';
+import Logger from '../utils/Logger.js';
+import DatabaseAdapter from '../database/DatabaseAdapter.js';
+import BaseScraper from '../scrapers/BaseScraper.js';
+import scraperConfig from '../config/scraper.js';
 
 class ScraperService {
     constructor() {
@@ -262,4 +262,4 @@ class ScraperService {
     }
 }
 
-module.exports = ScraperService;
+export default ScraperService;

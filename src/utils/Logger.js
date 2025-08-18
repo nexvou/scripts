@@ -3,7 +3,7 @@
  * Centralized logging with different levels
  */
 
-const winston = require('winston');
+import winston from 'winston';
 
 class Logger {
     constructor(module = 'App') {
@@ -58,4 +58,4 @@ class Logger {
     }
 }
 
-module.exports = Logger;
+export default Logger;

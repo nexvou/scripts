@@ -3,10 +3,10 @@
  * Provides unified interface for multiple database types
  */
 
-const knex = require('knex');
-const { createClient } = require('@supabase/supabase-js');
-const Logger = require('../utils/Logger');
-const dbConfig = require('../config/database');
+import knex from 'knex';
+import { createClient } from '@supabase/supabase-js';
+import Logger from '../utils/Logger.js';
+import dbConfig from '../config/database.js';
 
 class DatabaseAdapter {
     constructor() {
@@ -92,6 +92,22 @@ class DatabaseAdapter {
             this.logger.info('✅ Migrations completed successfully');
         } catch (error) {
             this.logger.error('❌ Migration failed:', error);
+            throw error;
+        }
+    }
+
+    async runSeeds() {
+        if (this.adapter === 'supabase') {
+            this.logger.info('🌱 Supabase seeding handled via dashboard');
+            return;
+        }
+
+        try {
+            this.logger.info('🌱 Running database seeds...');
+            await this.connection.seed.run();
+            this.logger.info('✅ Seeds completed successfully');
+        } catch (error) {
+            this.logger.error('❌ Seeding failed:', error);
             throw error;
         }
     }
@@ -327,4 +343,4 @@ class DatabaseAdapter {
     }
 }
 
-module.exports = DatabaseAdapter;
+export default DatabaseAdapter;

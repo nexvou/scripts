@@ -25,10 +25,10 @@ class CuratedScraper {
     async scrapePlatform(platform) {
         try {
             this.logger.info(`📚 Loading curated data for ${platform}`);
-            
+
             const allData = await this.loadCuratedData();
             const platformData = allData[platform.toLowerCase()] || [];
-            
+
             if (platformData.length === 0) {
                 this.logger.warn(`⚠️ No curated data found for ${platform}`);
                 return [];
@@ -44,12 +44,11 @@ class CuratedScraper {
                 title: this.addVariation(item.title, index),
                 scraped_at: new Date().toISOString(),
                 // Ensure valid_until is in the future
-                valid_until: item.valid_until || this.getFutureDate(7) // 7 days from now
+                valid_until: item.valid_until || this.getFutureDate(7), // 7 days from now
             }));
 
             this.logger.info(`✅ Loaded ${processedData.length} curated deals for ${platform}`);
             return processedData;
-
         } catch (error) {
             this.logger.error(`❌ Failed to scrape curated data for ${platform}:`, error.message);
             throw error;
@@ -62,15 +61,15 @@ class CuratedScraper {
             ' - Terbatas!',
             ' - Hari Ini Saja!',
             ' - Limited Time!',
-            ' - Buruan!'
+            ' - Buruan!',
         ];
-        
+
         // Add variation occasionally
         if (Math.random() > 0.7) {
             const variation = variations[index % variations.length];
             return title + variation;
         }
-        
+
         return title;
     }
 
@@ -93,10 +92,9 @@ class CuratedScraper {
         try {
             const allData = await this.loadCuratedData();
             allData[platform.toLowerCase()] = newDeals;
-            
+
             fs.writeFileSync(this.dataPath, JSON.stringify(allData, null, 2));
             this.logger.info(`✅ Updated curated data for ${platform}`);
-            
         } catch (error) {
             this.logger.error(`❌ Failed to update curated data:`, error.message);
             throw error;
@@ -106,24 +104,23 @@ class CuratedScraper {
     async addDeal(platform, deal) {
         try {
             const allData = await this.loadCuratedData();
-            
+
             if (!allData[platform.toLowerCase()]) {
                 allData[platform.toLowerCase()] = [];
             }
-            
+
             // Add timestamp and ensure required fields
             const processedDeal = {
                 ...deal,
                 scraped_at: new Date().toISOString(),
                 valid_until: deal.valid_until || this.getFutureDate(30),
-                status: deal.status || 'active'
+                status: deal.status || 'active',
             };
-            
+
             allData[platform.toLowerCase()].push(processedDeal);
-            
+
             fs.writeFileSync(this.dataPath, JSON.stringify(allData, null, 2));
             this.logger.info(`✅ Added new deal for ${platform}: ${deal.title}`);
-            
         } catch (error) {
             this.logger.error(`❌ Failed to add deal:`, error.message);
             throw error;

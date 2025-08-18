@@ -3,11 +3,11 @@
  * Production-ready base class for all platform scrapers
  */
 
-const puppeteer = require('puppeteer');
-const { v4: uuidv4 } = require('uuid');
-const Logger = require('../utils/Logger');
-const MetricsCollector = require('../utils/MetricsCollector');
-const AntiDetection = require('../utils/AntiDetection');
+import puppeteer from 'puppeteer';
+import { v4 as uuidv4 } from 'uuid';
+import Logger from '../utils/Logger.js';
+import MetricsCollector from '../utils/MetricsCollector.js';
+import AntiDetection from '../utils/AntiDetection.js';
 
 class BaseScraper {
     constructor(platform, database, config) {
@@ -70,8 +70,8 @@ class BaseScraper {
     }
 
     async findChromePath() {
-        const fs = require('fs');
-        const os = require('os');
+        const fs = await import('fs');
+        const os = await import('os');
 
         const possiblePaths = [
             // System Chrome (more stable)
@@ -468,4 +468,4 @@ class BaseScraper {
     }
 }
 
-module.exports = BaseScraper;
+export default BaseScraper;

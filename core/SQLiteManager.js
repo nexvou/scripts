@@ -25,7 +25,7 @@ class SQLiteManager {
             }
 
             // Initialize database with error handling
-            this.db = new sqlite3.Database(this.dbPath, (err) => {
+            this.db = new sqlite3.Database(this.dbPath, err => {
                 if (err) {
                     this.logger.error('Failed to open SQLite database:', err);
                     throw err;
