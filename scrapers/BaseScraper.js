@@ -9,7 +9,7 @@ class BaseScraper {
         this.db = db;
         this.browser = browser;
         this.logger = new Logger(`${config.name}Scraper`);
-        this.merchantId = null;
+        this.platformId = null;
         this.mockScraper = new MockScraper();
         this.httpScraper = new HttpScraper();
         this.curatedScraper = new CuratedScraper();
@@ -20,10 +20,10 @@ class BaseScraper {
     }
 
     async initialize() {
-        if (!this.merchantId) {
-            this.merchantId = await this.db.getMerchantId(this.config.slug);
-            if (!this.merchantId) {
-                throw new Error(`Merchant not found: ${this.config.slug}`);
+        if (!this.platformId) {
+            this.platformId = await this.db.getPlatformId(this.config.slug);
+            if (!this.platformId) {
+                throw new Error(`Platform not found: ${this.config.slug}`);
             }
         }
     }
@@ -284,7 +284,7 @@ class BaseScraper {
                 discount_type: discountType,
                 discount_value: discountValue,
                 coupon_code: item.coupon_code || item.code || null,
-                merchant_id: this.merchantId,
+                platform_id: this.platformId,
                 source_url:
                     item.source_url || item.link || defaultUrl || this.config.urls[Object.keys(this.config.urls)[0]],
                 image_url: item.image_url || item.image || null,

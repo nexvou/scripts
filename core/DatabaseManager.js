@@ -52,6 +52,14 @@ class DatabaseManager {
         }
     }
 
+    async getPlatformId(slug) {
+        if (this.isProduction) {
+            return this.getSupabasePlatformId(slug);
+        } else {
+            return this.sqlite.getPlatformId(slug);
+        }
+    }
+
     async getSupabaseMerchantId(slug) {
         // Use cache to avoid repeated queries
         if (this.merchantCache.has(slug)) {
@@ -70,6 +78,29 @@ class DatabaseManager {
             return data.id;
         } catch (error) {
             this.logger.error(`Error getting merchant ID for ${slug}:`, error);
+            return null;
+        }
+    }
+
+    async getSupabasePlatformId(slug) {
+        // Use cache to avoid repeated queries
+        const cacheKey = `platform_${slug}`;
+        if (this.merchantCache.has(cacheKey)) {
+            return this.merchantCache.get(cacheKey);
+        }
+
+        try {
+            const { data, error } = await this.supabase.from('platforms').select('id').eq('slug', slug).single();
+
+            if (error || !data) {
+                this.logger.warn(`Platform not found: ${slug}`);
+                return null;
+            }
+
+            this.merchantCache.set(cacheKey, data.id);
+            return data.id;
+        } catch (error) {
+            this.logger.error(`Error getting platform ID for ${slug}:`, error);
             return null;
         }
     }
